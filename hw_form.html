@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>1</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link href="css/styles.css" rel="stylesheet">
+	<script src="js/vue.js"></script>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="sample">
+			<form>
+				<div class="progress">
+					<div class="progress-bar" :style="{ width: progressBar }"></div>
+				</div>
+				<div>
+					<div class="form-group" v-for="(field, i) in info" :key="i">
+						<label>
+							{{ field.label }}
+							<span v-if="field.activated" :class="field.valid ? 'fa fa-check-circle text-success' : 'fa fa-exclamation-circle text-danger'"></span>
+						</label>
+						<input type="text" class="form-control" :value="field.value" @input="onInput(i, $event.target.value)">
+					</div>
+				</div>
+				<button class="btn btn-primary" :disabled="!isFormValid">
+					Send Data
+				</button>
+			</form>
+			<pre>
+				{{ info }}
+			</pre>
+			<div>
+				<table class="table table-bordered">
+					<tr>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script>
+		Vue.createApp({
+			data: () => ({
+				info: [
+					{
+						label: 'Name',
+						value: '',
+						pattern: /^[a-zA-Z ]{2,30}$/
+					},
+					{
+						label: 'Phone',
+						value: '',
+						pattern: /^[0-9]{7,14}$/
+					},
+					{
+						label: 'Email',
+						value: '',
+						pattern: /.+/
+					},
+					{
+						label: 'Some Field 1',
+						value: '',
+						pattern: /.+/
+					},
+					{
+						label: 'Some Field 2',
+						value: '',
+						pattern: /.+/
+					}
+				]
+			}),
+			methods: {
+				onInput(i, val) {
+					let field = this.info[i];
+					field.value = val.trim();
+					field.activated = true;
+					field.valid = field.pattern.test(field.value);
+				}
+			},
+			computed: {
+				isFormValid() {
+					return this.info.every(field => field.valid);
+				},
+				progressBar() {
+					let progress = 0;
+					this.info.forEach(field => {
+						if (field.valid) {
+							progress += 20;
+						}
+					});
+					return progress + '%';
+				}
+			},
+			created() {
+				this.info.forEach(field => {
+					field.valid = false;
+					field.activated = false;
+				});
+			}
+		}).mount('.sample');
+	</script>
+</body>
+</html>
